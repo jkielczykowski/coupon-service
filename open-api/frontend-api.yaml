@@ -1,0 +1,11 @@
+openapi: 3.0.3
+info:
+  title: Coupon Service API
+  version: 1.0.0
+  description: API for creating and redeeming discount coupons
+
+paths:
+  /coupons:
+    $ref: './coupon.yaml#/CouponCollectionPath'
+  /coupons/redeem:
+    $ref: './coupon.yaml#/CouponRedeemPath'

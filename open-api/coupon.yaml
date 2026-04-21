@@ -1,0 +1,193 @@
+CouponCollectionPath:
+  get:
+    tags:
+      - Coupon
+    summary: List coupons
+    operationId: getCoupons
+    responses:
+      '200':
+        description: Coupons retrieved successfully
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CouponResponse'
+
+  post:
+    tags:
+      - Coupon
+    summary: Create a new coupon
+    operationId: createCoupon
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateCouponRequest'
+    responses:
+      '201':
+        description: Coupon created successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CouponResponse'
+      '400':
+        description: Invalid request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+      '409':
+        description: Coupon code already exists
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+
+CouponRedeemPath:
+  post:
+    tags:
+      - CouponRedeem
+    summary: Redeem a coupon
+    operationId: redeemCoupon
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/RedeemCouponRequest'
+    responses:
+      '200':
+        description: Coupon redeemed successfully
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RedeemCouponResponse'
+      '400':
+        description: Invalid request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+      '403':
+        description: Coupon cannot be redeemed from user's country
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+      '404':
+        description: Coupon not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+      '409':
+        description: Coupon cannot be redeemed
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    CreateCouponRequest:
+      type: object
+      required:
+        - code
+        - maxUsages
+        - country
+      properties:
+        code:
+          type: string
+          minLength: 1
+          example: WIOSNA2026
+        maxUsages:
+          type: integer
+          format: int32
+          minimum: 1
+          example: 100
+        country:
+          type: string
+          minLength: 2
+          maxLength: 2
+          description: ISO 3166-1 alpha-2 country code
+
+    RedeemCouponRequest:
+      type: object
+      required:
+        - code
+        - userId
+      properties:
+        code:
+          type: string
+          example: WIOSNA2026
+        userId:
+          type: string
+          format: uuid
+          example: 550e8400-e29b-41d4-a716-446655440000
+
+    CouponResponse:
+      type: object
+      required:
+        - code
+        - createdAt
+        - maxUsages
+        - currentUsages
+        - country
+      properties:
+        code:
+          type: string
+          example: WIOSNA2026
+        createdAt:
+          type: string
+          format: date-time
+          example: '2026-04-20T10:15:30Z'
+        maxUsageCount:
+          type: integer
+          format: int32
+          example: 100
+        currentUsageCount:
+          type: integer
+          format: int32
+          example: 5
+        countryCode:
+          type: string
+          example: PL
+
+    RedeemCouponResponse:
+      type: object
+      required:
+        - code
+        - userId
+        - redeemedAt
+        - remainingUsages
+        - status
+      properties:
+        code:
+          type: string
+          example: WIOSNA2026
+        userId:
+          type: string
+          example: user-123
+        redeemedAt:
+          type: string
+          format: date-time
+          example: '2026-04-20T10:20:00Z'
+        remainingUsages:
+          type: integer
+          format: int32
+          example: 94
+
+    ErrorResponse:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          example: COUPON_NOT_FOUND
+        message:
+          type: string
+          example: Coupon with the provided code was not found.

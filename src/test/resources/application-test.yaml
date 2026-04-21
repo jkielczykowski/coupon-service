@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:14:///coupon
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+geoip:
+  url: http://ip-api.com/json/{ip}?fields=status,message,countryCode
+  timeout:
+    connect: 2s
+    read: 2s
